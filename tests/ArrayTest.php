@@ -1,9 +1,10 @@
 <?php
 namespace PredictHQ\AddressFormatter\Test;
 
+use PHPUnit\Framework\TestCase;
 use PredictHQ\AddressFormatter\Formatter;
 
-class ArrayTest extends \PHPUnit_Framework_TestCase
+class ArrayTest extends TestCase
 {
     public function testAddressArray()
     {

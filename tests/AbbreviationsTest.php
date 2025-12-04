@@ -1,9 +1,10 @@
 <?php
 namespace PredictHQ\AddressFormatter\AbbreviationsTest;
 
+use PHPUnit\Framework\TestCase;
 use PredictHQ\AddressFormatter\Formatter;
 
-class AddressObjectTest extends \PHPUnit_Framework_TestCase
+class AddressObjectTest extends TestCase
 {
     public function testAbbreviateAvenue()
     {
