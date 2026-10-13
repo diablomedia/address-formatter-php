@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
   push:
-    branches: [master, symfony6]
+    branches: [master]
 
 permissions:
   contents: read # Required for checkout and zizmor online audits.
