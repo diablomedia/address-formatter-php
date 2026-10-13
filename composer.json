@@ -1,9 +1,18 @@
 {
-    "name": "predicthq/address-formatter",
+    "name": "diablomedia/address-formatter-php",
     "description": "Address formatter using country templates from https://github.com/OpenCageData/address-formatting",
-    "keywords": ["predicthq","address"],
+    "keywords": [
+        "address",
+        "formatter",
+        "internationalization"
+    ],
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/diablomedia/address-formatter-php",
+    "support": {
+        "issues": "https://github.com/diablomedia/address-formatter-php/issues",
+        "source": "https://github.com/diablomedia/address-formatter-php"
+    },
     "authors": [
         {
             "name": "PredictHQ",
@@ -13,23 +22,60 @@
             "name": "Robert Kern",
             "homepage": "http://www.robertkern.com",
             "role": "Developer"
+        },
+        {
+            "name": "Diablo Media",
+            "homepage": "https://diablomedia.com",
+            "role": "Maintainer"
         }
     ],
     "require": {
-        "php": ">=7.1.3",
-        "predicthq/address-formatter-templates": "~1.0",
-        "symfony/yaml": "^4.0 || ^5.0 || ^6.0 || ^7.0",
-        "mustache/mustache": "~2.0"
+        "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "mustache/mustache": "^3.0",
+        "symfony/yaml": "^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0"
+        "friendsofphp/php-cs-fixer": "^3.95.27",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^11.5.57 || ^12.5.38 || ^13.4.1",
+        "rector/rector": "^2.7"
     },
     "autoload": {
         "psr-4": {
             "PredictHQ\\AddressFormatter\\": "src"
         },
         "exclude-from-classmap": [
-            "/tests/"
+            "/tests/",
+            "/scripts/"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PredictHQ\\AddressFormatter\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "predicthq/address-formatter": "self.version"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit",
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=512M",
+        "cs:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff --sequential",
+        "cs:fix": "@php vendor/bin/php-cs-fixer fix --sequential",
+        "check": [
+            "@templates:check",
+            "@test",
+            "@analyse",
+            "@cs:check",
+            "@rector:check"
+        ],
+        "rector:check": "@php vendor/bin/rector process --dry-run --clear-cache",
+        "rector:fix": "@php vendor/bin/rector process",
+        "templates:sync": "@php scripts/templates.php sync",
+        "templates:check": "@php scripts/templates.php check",
+        "templates:update": "@php scripts/templates.php update"
     }
 }

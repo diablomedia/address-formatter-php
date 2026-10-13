@@ -1,12 +1,13 @@
 <?php
-namespace PredictHQ\AddressFormatter\Test;
+
+namespace PredictHQ\AddressFormatter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use PredictHQ\AddressFormatter\Address;
 
 class AddressObjectTest extends TestCase
 {
-    public function testAddressObject()
+    public function testAddressObject(): void
     {
         $a = new Address();
         $a->setCity('Wellington')
@@ -30,7 +31,7 @@ New Zealand
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectAttention()
+    public function testAddressObjectAttention(): void
     {
         $a = new Address();
         $a->setAttention('Beehive')
@@ -55,7 +56,7 @@ New Zealand
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectHouse()
+    public function testAddressObjectHouse(): void
     {
         $a = new Address();
         $a->setHouse('Beehive')
@@ -80,7 +81,7 @@ New Zealand
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectVillage()
+    public function testAddressObjectVillage(): void
     {
         $a = new Address();
         $a->setHouse('Executive Office Building (American Samoa Government)')
@@ -93,7 +94,8 @@ New Zealand
 
         $expected = 'Executive Office Building (American Samoa Government)
 Route 001
-Faganeanea, AS 96799
+Faganeanea
+Ituau, AS 96799
 United States of America
 ';
 
@@ -102,7 +104,7 @@ United States of America
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectStateDistrict()
+    public function testAddressObjectStateDistrict(): void
     {
         $a = new Address();
         $a->setCountry('Bosnia and Herzegovina')
@@ -128,7 +130,7 @@ Bosnia and Herzegovina
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectRegion()
+    public function testAddressObjectRegion(): void
     {
         $a = new Address();
         $a->setAttention('Khorsheed Optician')
@@ -152,14 +154,14 @@ Palestine
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectIsland()
+    public function testAddressObjectIsland(): void
     {
         $a = new Address();
         $a->setCountry('United States Minor Outlying Islands')
           ->setCountryCode('um')
           ->setIsland('Wake Island');
 
-        $expected = 'Wake Island, UM
+        $expected = 'Wake Island, US Minor Outlying Islands
 United States of America
 ';
 
@@ -168,7 +170,7 @@ United States of America
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectIsland2()
+    public function testAddressObjectIsland2(): void
     {
         $a = new Address();
         $a->setHouse('Government of the BVI')
@@ -191,7 +193,7 @@ British Virgin Islands, VG1110
         $this->assertSame($expected, $actual);
     }
 
-    public function testAddressObjectContinent()
+    public function testAddressObjectContinent(): void
     {
         $a = new Address();
         $a->setHouse('Oil Separator Building')

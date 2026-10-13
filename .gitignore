@@ -1,9 +1,10 @@
-/vendor
-/build
+/vendor/
+/build/
 composer.lock
 .DS_Store
-
-# Snyk Security Extension - AI Rules (auto-generated)
-.github/instructions/snyk_rules.instructions.md
-
 .phpunit.result.cache
+.phpunit.cache/
+.php-cs-fixer.cache
+.phpstan.cache/
+coverage.xml
+.rector.cache/
