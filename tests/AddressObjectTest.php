@@ -3,10 +3,57 @@
 namespace PredictHQ\AddressFormatter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PredictHQ\AddressFormatter\Address;
+use PredictHQ\AddressFormatter\Formatter;
 
 class AddressObjectTest extends TestCase
 {
+    /** @return iterable<string, array{string}> */
+    public static function nullableAddressFields(): iterable
+    {
+        foreach (['Attention', 'HouseNumber', 'House', 'Road', 'Village', 'Suburb', 'City', 'County', 'Postcode', 'StateDistrict', 'State', 'Region', 'Island', 'Country', 'CountryCode', 'Continent'] as $field) {
+            yield $field => [$field];
+        }
+    }
+
+    #[DataProvider('nullableAddressFields')]
+    public function testSettersPreserveNullWhenClearingValues(string $field): void
+    {
+        $address = new Address();
+        $setter = 'set' . $field;
+        $getter = 'get' . $field;
+
+        self::assertSame('', $address->$getter());
+        $address->$setter('previous value');
+        self::assertSame($address, $address->$setter(null));
+        self::assertNull($address->$getter());
+    }
+
+    public function testNullComponentsAreOmittedDuringFormatting(): void
+    {
+        $address = new Address();
+
+        foreach (self::nullableAddressFields() as [$field]) {
+            $setter = 'set' . $field;
+            $address->$setter(null);
+        }
+
+        self::assertSame("\n", $address->format());
+
+        $address->setHouseNumber(53)
+            ->setRoad('Pirie Street')
+            ->setCity('Wellington')
+            ->setPostcode(6011)
+            ->setCountry('New Zealand')
+            ->setCountryCode('NZ');
+
+        $expected = "53 Pirie Street\nWellington 6011\nNew Zealand\n";
+
+        self::assertSame($expected, $address->format());
+        self::assertSame($expected, (new Formatter())->format($address));
+    }
+
     public function testAddressObject(): void
     {
         $a = new Address();
