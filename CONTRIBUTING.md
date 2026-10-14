@@ -31,7 +31,14 @@ To adopt the latest upstream templates, run:
 composer templates:update
 ```
 
-This advances the submodule to the latest upstream commit, regenerates the snapshot
+The CLI is a Symfony Console application with `check`, `sync`, and `update`
+commands. The Composer shortcuts invoke those same commands. For help and command
+options, run `php scripts/templates.php --help`, `php scripts/templates.php list`,
+or `php scripts/templates.php update --help`. Running the script without a command
+performs `check`. Use `--quiet` to suppress normal output or `--verbose` for more
+error detail. Symfony Console and Process are development dependencies only.
+
+`templates:update` advances the submodule to the latest upstream commit, regenerates the snapshot
 (including deletion of obsolete files), and runs `composer check`. Review changes
 to the submodule pointer and snapshot, then commit them together. Check failures
 leave the generated changes available for review; resolve them before committing.
