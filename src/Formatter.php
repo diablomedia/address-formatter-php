@@ -27,6 +27,9 @@ use PredictHQ\AddressFormatter\Exception\TemplatesMissingException;
  */
 class Formatter
 {
+    /** @var array<string, array{source: string, data: mixed}> */
+    private static array $parsedTemplates = [];
+
     /** @var array<string, list<string>> */
     private array $components = [];
     /** @var array<string, string> */
@@ -659,7 +662,7 @@ class Formatter
             $componentYamlParts = explode('---', $this->readTemplateFile($componentsPath));
 
             foreach ($componentYamlParts as $key => $val) {
-                $component = Yaml::parse($val);
+                $component = $this->parseTemplate($componentsPath . '#' . $key, $val);
 
                 if (isset($component['aliases'])) {
                     foreach ($component['aliases'] as $k => $v) {
@@ -671,15 +674,15 @@ class Formatter
             }
 
             //Load the country templates, state codes and country2lang data
-            $templates = Yaml::parse($this->readTemplateFile($countriesPath));
-            $stateCodes = Yaml::parse($this->readTemplateFile($stateCodesPath));
-            $countryToLang = Yaml::parse($this->readTemplateFile($countryToLangPath));
-            $countyCodes = Yaml::parse($this->readTemplateFile($countyCodesPath));
+            $templates = $this->parseTemplate($countriesPath, $this->readTemplateFile($countriesPath));
+            $stateCodes = $this->parseTemplate($stateCodesPath, $this->readTemplateFile($stateCodesPath));
+            $countryToLang = $this->parseTemplate($countryToLangPath, $this->readTemplateFile($countryToLangPath));
+            $countyCodes = $this->parseTemplate($countyCodesPath, $this->readTemplateFile($countyCodesPath));
 
             //Load the abbreviations files
             foreach ($abbreviationFiles as $key => $val) {
                 $lang = strtoupper(basename($val, '.yaml'));
-                $data = Yaml::parse($this->readTemplateFile($val));
+                $data = $this->parseTemplate($val, $this->readTemplateFile($val));
                 $abbreviations[$lang] = $data;
             }
 
@@ -693,6 +696,20 @@ class Formatter
         } else {
             throw new TemplatesMissingException('Address formatting templates path cannot be found.');
         }
+    }
+
+    private function parseTemplate(string $key, string $source): mixed
+    {
+        // Read files on every load so edits and missing files retain their behavior.
+        // Only parsing is shared; PHP arrays keep each formatter's data independent.
+        if (isset(self::$parsedTemplates[$key]) && self::$parsedTemplates[$key]['source'] === $source) {
+            return self::$parsedTemplates[$key]['data'];
+        }
+
+        $data = Yaml::parse($source);
+        self::$parsedTemplates[$key] = ['source' => $source, 'data' => $data];
+
+        return $data;
     }
 
     private function readTemplateFile(string $path): string
