@@ -1,22 +1,24 @@
 <?php
-namespace PredictHQ\AddressFormatter\AbbreviationsTest;
 
+namespace PredictHQ\AddressFormatter\Tests;
+
+use PHPUnit\Framework\TestCase;
 use PredictHQ\AddressFormatter\Formatter;
 
-class AddressObjectTest extends \PHPUnit_Framework_TestCase
+class AbbreviationsTest extends TestCase
 {
-    public function testAbbreviateAvenue()
+    public function testAbbreviateAvenue(): void
     {
         $address = [
-          'country_code' => 'US',
-          'house_number' => '301',
-          'road' => 'Hamilton Avenue',
-          'neighbourhood' => 'Crescent Park',
-          'city' => 'Palo Alto',
-          'postcode' => '94303',
-          'county' => 'Santa Clara County',
-          'state' => 'California',
-          'country' => 'United States',
+            'country_code' => 'US',
+            'house_number' => '301',
+            'road' => 'Hamilton Avenue',
+            'neighbourhood' => 'Crescent Park',
+            'city' => 'Palo Alto',
+            'postcode' => '94303',
+            'county' => 'Santa Clara County',
+            'state' => 'California',
+            'country' => 'United States',
         ];
 
         $expected = '301 Hamilton Ave
@@ -30,18 +32,18 @@ United States of America
         $this->assertSame($expected, $actual);
     }
 
-    public function testAbbreviateRoad()
+    public function testAbbreviateRoad(): void
     {
         $address = [
-          'country_code' => 'US',
-          'house_number' => '301',
-          'road' => 'Northwestern University Road',
-          'neighbourhood' => 'Crescent Park',
-          'city' => 'Palo Alto',
-          'postcode' => '94303',
-          'county' => 'Santa Clara County',
-          'state' => 'California',
-          'country' => 'United States',
+            'country_code' => 'US',
+            'house_number' => '301',
+            'road' => 'Northwestern University Road',
+            'neighbourhood' => 'Crescent Park',
+            'city' => 'Palo Alto',
+            'postcode' => '94303',
+            'county' => 'Santa Clara County',
+            'state' => 'California',
+            'country' => 'United States',
         ];
 
         $expected = '301 Northwestern University Rd
@@ -55,17 +57,17 @@ United States of America
         $this->assertSame($expected, $actual);
     }
 
-    public function testAbbreviateCanada()
+    public function testAbbreviateCanada(): void
     {
         $address = [
-          'city' => 'Vancouver',
-          'country' => 'Canada',
-          'country_code' => 'ca',
-          'county' => 'Greater Vancouver Regional District',
-          'postcode' => 'V6K',
-          'road' => 'Cornwall Avenue',
-          'state' => 'British Columbia',
-          'suburb' => 'Kitsilano',
+            'city' => 'Vancouver',
+            'country' => 'Canada',
+            'country_code' => 'ca',
+            'county' => 'Greater Vancouver Regional District',
+            'postcode' => 'V6K',
+            'road' => 'Cornwall Avenue',
+            'state' => 'British Columbia',
+            'suburb' => 'Kitsilano',
         ];
 
         $expected = 'Cornwall Ave
@@ -79,20 +81,20 @@ Canada
         $this->assertSame($expected, $actual);
     }
 
-    public function testAbbreviateSpain()
+    public function testAbbreviateSpain(): void
     {
         $address = [
-          'city' => 'Barcelona',
-          'city_district' => 'Sarrià - Sant Gervasi',
-          'country' => 'Spain',
-          'country_code' => 'es',
-          'county' => 'BCN',
-          'house_number' => '68',
-          'neighbourhood' => 'Sant Gervasi',
-          'postcode' => '08017',
-          'road' => 'Carrer de Calatrava',
-          'state' => 'Catalonia',
-          'suburb' => 'les Tres Torres',
+            'city' => 'Barcelona',
+            'city_district' => 'Sarrià - Sant Gervasi',
+            'country' => 'Spain',
+            'country_code' => 'es',
+            'county' => 'BCN',
+            'house_number' => '68',
+            'neighbourhood' => 'Sant Gervasi',
+            'postcode' => '08017',
+            'road' => 'Carrer de Calatrava',
+            'state' => 'Catalonia',
+            'suburb' => 'les Tres Torres',
         ];
 
         $expected = 'C Calatrava, 68
