@@ -10,7 +10,7 @@ class CommandRunnerTest extends TestCase
     public function testLargeStderrDoesNotBlockStdout(): void
     {
         $child = 'fwrite(STDERR, str_repeat("x", 2 * 1024 * 1024)); fwrite(STDOUT, "completed\\n");';
-        $code = $this->runnerCode($child) . 'echo runCommand($command, __DIR__);';
+        $code = $this->runnerCode($child) . 'echo $runCommand($command, __DIR__);';
         [$status, $stdout, $stderr] = $this->runHarness($code);
 
         self::assertSame(0, $status);
@@ -23,7 +23,7 @@ class CommandRunnerTest extends TestCase
         $child = 'fwrite(STDERR, "diagnostic:" . str_repeat("x", 2 * 1024 * 1024)); fwrite(STDOUT, "stdout-marker"); exit(23);';
         $code = $this->runnerCode($child) . <<<'PHP'
             try {
-                runCommand($command, __DIR__);
+                $runCommand($command, __DIR__);
                 exit(2);
             } catch (RuntimeException $error) {
                 echo json_encode([
@@ -43,7 +43,7 @@ class CommandRunnerTest extends TestCase
     public function testPrintedOutputKeepsStdoutAndStderrSeparate(): void
     {
         $child = 'fwrite(STDERR, str_repeat("x", 2 * 1024 * 1024)); fwrite(STDOUT, "completed\\n");';
-        $code = $this->runnerCode($child) . '$result = runCommand($command, __DIR__, true); echo "return:" . $result;';
+        $code = $this->runnerCode($child) . '$result = $runCommand($command, __DIR__, new \\Symfony\\Component\\Console\\Output\\ConsoleOutput()); echo "return:" . $result;';
         [$status, $stdout, $stderr] = $this->runHarness($code);
 
         self::assertSame(0, $status);
@@ -51,25 +51,17 @@ class CommandRunnerTest extends TestCase
         self::assertSame(str_repeat('x', 2 * 1024 * 1024), $stderr);
     }
 
-    public function testOutputCallbackReceivesBothStreams(): void
+    public function testQuietOutputStillCapturesTheResult(): void
     {
         $child = 'fwrite(STDERR, str_repeat("x", 2 * 1024 * 1024)); fwrite(STDOUT, "completed\\n");';
         $code = $this->runnerCode($child) . <<<'PHP'
-            $out = '';
-            $err = '';
-            $result = runCommand($command, __DIR__, false, static function (string $type, string $buffer) use (&$out, &$err): void {
-                if ($type === \Symfony\Component\Process\Process::ERR) {
-                    $err .= $buffer;
-                } else {
-                    $out .= $buffer;
-                }
-            });
-            echo json_encode([$result === 'completed', $out === "completed\n", $err === str_repeat('x', 2 * 1024 * 1024)], JSON_THROW_ON_ERROR);
+            $output = new \Symfony\Component\Console\Output\ConsoleOutput(\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_QUIET);
+            echo $runCommand($command, __DIR__, $output);
             PHP;
         [$status, $stdout, $stderr] = $this->runHarness($code);
 
         self::assertSame(0, $status);
-        self::assertSame('[true,true,true]', $stdout);
+        self::assertSame('completed', $stdout);
         self::assertSame('', $stderr);
     }
 
@@ -77,8 +69,11 @@ class CommandRunnerTest extends TestCase
     {
         return 'namespace DiabloMedia\\AddressFormatter\\Maintenance; use RuntimeException; require '
             . var_export(dirname(__DIR__) . '/vendor/autoload.php', true)
-            . '; require ' . var_export(dirname(__DIR__) . '/scripts/command.php', true)
-            . '; $command = ' . var_export([PHP_BINARY, '-r', $child], true) . ';';
+            . '; require ' . var_export(dirname(__DIR__) . '/scripts/TemplateCommand.php', true)
+            . '; $instance = new TemplateCommand("check", __DIR__);'
+            . ' $method = new \ReflectionMethod(TemplateCommand::class, "runCommand");'
+            . ' $runCommand = static fn (...$arguments) => $method->invoke($instance, ...$arguments);'
+            . ' $command = ' . var_export([PHP_BINARY, '-r', $child], true) . ';';
     }
 
     /** @return array{int, string, string} */

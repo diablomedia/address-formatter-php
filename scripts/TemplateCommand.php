@@ -37,19 +37,19 @@ final class TemplateCommand extends Command
         $submodule = $root . '/address-formatter-templates';
         $destination = $root . '/resources/templates';
 
-        if (file_exists($submodule . '/.git') && runCommand(['git', 'status', '--porcelain'], $submodule) !== '') {
+        if (file_exists($submodule . '/.git') && $this->runCommand(['git', 'status', '--porcelain'], $submodule) !== '') {
             throw new RuntimeException('The templates submodule has local changes. Commit or discard them before synchronizing.');
         }
 
         if ($mode === 'update') {
-            $this->runWithOutput(['git', 'submodule', 'update', '--init', '--remote', '--', 'address-formatter-templates'], $output);
+            $this->runCommand(['git', 'submodule', 'update', '--init', '--remote', '--', 'address-formatter-templates'], $root, $output);
         }
 
         if (!file_exists($submodule . '/.git') || !is_dir($submodule . '/conf')) {
             throw new RuntimeException('Initialize the templates submodule with: git submodule update --init');
         }
 
-        $commit = runCommand(['git', 'rev-parse', 'HEAD'], $submodule);
+        $commit = $this->runCommand(['git', 'rev-parse', 'HEAD'], $submodule);
         $expected = $this->readFiles($submodule . '/conf');
         $license = file_get_contents($submodule . '/LICENSE.txt');
 
@@ -96,7 +96,7 @@ final class TemplateCommand extends Command
         $output->writeln('Synchronized bundled templates to upstream commit ' . $commit . '.');
 
         if ($mode === 'update') {
-            $this->runWithOutput(['composer', 'check'], $output);
+            $this->runCommand(['composer', 'check'], $root, $output);
         }
 
         return Command::SUCCESS;
@@ -138,11 +138,20 @@ final class TemplateCommand extends Command
     }
 
     /** @param list<string> $command */
-    private function runWithOutput(array $command, OutputInterface $output): void
+    private function runCommand(array $command, string $directory, ?OutputInterface $output = null): string
     {
-        runCommand($command, $this->root, false, static function (string $type, string $buffer) use ($output): void {
+        $process = new Process($command, $directory);
+        // Quality checks can take longer than Symfony's default timeout.
+        $process->setTimeout(null);
+        $process->run($output === null ? null : static function (string $type, string $buffer) use ($output): void {
             $stream = $type === Process::ERR && $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
             $stream->write($buffer, false, OutputInterface::OUTPUT_RAW);
         });
+
+        if (!$process->isSuccessful()) {
+            throw new RuntimeException(implode(' ', $command) . ' failed: ' . trim($process->getErrorOutput() . "\n" . $process->getOutput()));
+        }
+
+        return trim($process->getOutput());
     }
 }

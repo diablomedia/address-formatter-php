@@ -5,7 +5,6 @@ namespace DiabloMedia\AddressFormatter\Maintenance;
 use Symfony\Component\Console\Application;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once __DIR__ . '/command.php';
 require_once __DIR__ . '/TemplateCommand.php';
 
 $application = new Application('Address template maintenance');

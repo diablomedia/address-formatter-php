@@ -13,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
-require_once dirname(__DIR__) . '/scripts/command.php';
 require_once dirname(__DIR__) . '/scripts/TemplateCommand.php';
 
 class TemplateCommandTest extends TestCase
